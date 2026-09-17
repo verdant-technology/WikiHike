@@ -16,8 +16,11 @@ AGENTS.md           This file.
 api/                Deno Deploy REST API. TypeScript.
 android/            Native Kotlin client. Gradle.
 db/migrations/      Numbered, forward-only SQL. The schema's source of truth.
-docs/               Design specs and research writeups.
+docs/               Research writeups and anything genuinely repo-wide.
 ```
+
+Plans (`*.plan.md`) and antagonistic self reviews (`*.asr.md`) are not collected in `docs/`.
+They live next to the code they describe, same as tests. See **Antagonistic Self Review**.
 
 **Why a monorepo.** The sync protocol is hand-rolled and the CRDT deltas have to agree on
 both ends. A schema change, the endpoint that serves it, and the client code that consumes
@@ -152,6 +155,77 @@ anywhere, and let the database suite be the slower, more valuable one.
 
 ---
 
+## Antagonistic Self Review
+
+**Plans and ASRs are source code.** They are written in the repo, committed, diffed, and
+read. They are not scratch notes and they are not a chat transcript. If a plan is worth
+following it is worth versioning, and if a review found something it is worth keeping the
+finding after the fix, because the finding is the reason the code looks the way it does.
+
+Two things get reviewed: **the plan, before code is written**, and **the completed diff,
+before it merges**. Both are adversarial passes on your own work, and both write into the
+same document.
+
+### Where they live
+
+Collocated with the code they describe, same principle as tests:
+
+```
+api/src/sync/
+  reconcile.ts
+  reconcile.test.ts
+  reconcile.plan.md
+  reconcile.asr.md
+```
+
+A change that spans `api/` and `android/` gets one home — wherever its center of gravity
+is — and a link from the other places it touches. Two copies of a plan is two plans, and
+one of them is wrong.
+
+The `.asr.md` is a living document, not a numbered series. Rounds are git history. What the
+file carries forward is the set of findings that are still open.
+
+### The adversarial pass
+
+You are not proofreading. You are trying to make your own work fail. Useful angles:
+
+- What input makes this wrong? Empty, enormous, duplicated, out of order, at a cell
+  boundary, at the antimeridian, mid-sync, offline.
+- What did the plan assume that nobody actually verified?
+- Which non-negotiable above does this quietly violate?
+- What does this make expensive later? What does it close off?
+- What alternative got dismissed without being written down?
+- If this is wrong in production, how would we find out? Would we find out?
+
+### Severity, and what iterates
+
+Every finding gets one of three labels.
+
+| Label | Meaning | Effect |
+|---|---|---|
+| **blocker** | Correctness, data loss, security, violates a non-negotiable, or closes off a path without recording why. | Iterate. Nothing proceeds while one is open. |
+| **should-fix** | Real, worth doing, not worth stopping for. | Recorded and carried as known debt. Does not block. |
+| **noted** | Observation, tradeoff, or context worth having later. | Recorded. No action expected. |
+
+**Iterate on blockers only.** When no blocker is open, the plan proceeds or the diff merges,
+carrying its should-fix and noted items with it. There is no round count; severity is the
+gate.
+
+The `.asr.md` is therefore also the debt ledger for that code. Open should-fix items are
+supposed to accumulate visibly. That is the point.
+
+**On downgrading.** The classification is the part of this process that can be gamed, and
+the gaming is always the same move: a blocker becomes a should-fix because fixing it is
+inconvenient. So: a finding's severity may be lowered, but the original wording stays and
+the reason for the downgrade is written next to it. A downgrade you cannot justify in
+writing is not a downgrade.
+
+**When round two still surfaces blockers on the same axis,** stop iterating. Repeated
+blockers in one area mean the plan is wrong at a level ASR cannot fix. Escalate it as a
+tradeoff rather than grinding.
+
+---
+
 ## Decided since the handoff
 
 `ARCHITECTURE.md` lists these as open. They are not anymore. That document is the author's
@@ -163,13 +237,20 @@ prose and has not been edited; these are recorded here instead.
   Read paths must handle a trail-less hike; assume nothing.
 - **Monorepo.** See repo map above.
 - **Test data access against real Postgres on a per-run Neon branch.** See above.
+- **Antagonistic Self Review on plans and diffs, gated on blockers.** See above. Plans and
+  ASRs are committed artifacts, collocated with their code.
 
 ---
 
 ## Working agreements
 
+**Order of work.** Plan, ASR the plan, iterate until no blocker is open, write the code,
+ASR the diff, iterate until no blocker is open, merge. Skipping the plan is allowed for
+changes small enough that the plan would be longer than the diff. Skipping the ASR is not.
+
 **Commits.** Explain why, not what. The diff already says what. A commit that closes off an
-alternative should say which one.
+alternative should say which one. The plan and its ASR land in the same commit as the code
+they describe, or in the commit immediately before it. They are not a follow-up.
 
 **Migrations.** One migration per logical change. Name them `NNNN_short_description.sql`.
 Every migration that adds a constraint to an existing table needs a note about what happens
@@ -186,3 +267,5 @@ Deploy needs an argument, not just a benchmark.
 
 **When you hit a real fork in the road, stop and surface it.** Frame it as a tradeoff with
 the options and what each one costs. Do not pick silently and do not pick by defaulting.
+An ASR that keeps returning to the same fork is that signal arriving late; treat it the same
+way.
