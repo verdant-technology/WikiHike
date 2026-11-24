@@ -99,7 +99,7 @@ def fit(d: pd.DataFrame, y: str) -> dict:
     return {"y": y, "est": m.params["treat"], "se": m.bse["treat"], "lo": ci[0], "hi": ci[1],
             "p": m.pvalues["treat"], "n_treat": int(dd.treat.sum()), "n_ctrl": int((1 - dd.treat).sum()),
             "ctrl_pre_mean": dd.loc[dd.treat == 0, y.replace("d_", "") + "_pre"].mean()
-            if y.startswith("d_") else np.nan}
+            if y.replace("d_", "") + "_pre" in dd.columns else np.nan}
 
 
 def mde(d: pd.DataFrame) -> dict:

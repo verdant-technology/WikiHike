@@ -91,6 +91,57 @@ For scale: 0.005 fouls/possession is about 0.1 foul over the 20-possession windo
 - 26% of challenges fall in the late-game zone and are not studied here.
 - Challenge counts are not yet validated against official.nba.com (blocked from here).
 
+## Q1. Do refs make up for an overturn? (spec H2)
+
+**Disclosure.** The Q0 descriptive split by result (already seen) motivated this test. Q1
+fixes the controls, outcome, and decision rule before running the contrast, but it is not
+blind to that pattern.
+
+**Question.** After a challenge is overturned, does the challenger's net foul burden
+(fouls on challenger minus fouls on opponent) rise relative to after a lost challenge?
+
+**Events.** Coach's challenges outside the late-game zone with the challenger identified
+(timeout row or reviewed call). Treated: overturn (3,288). Control: lost, support and
+stands pooled (2,129). Same windows, exposure filter and possession rules as Q0.
+
+**Outcomes.**
+1. `d_net` (**primary**): change, post minus pre, in (challenger fouls - opponent fouls)
+   per possession. Makeup predicts a positive coefficient.
+2. `d_agg`, `d_oth`: the two components.
+3. `d_net_def` (robustness): same, but each team's rate is computed only over its own
+   defensive possessions. Immune to who has the ball when.
+
+**Model.** Event-level OLS, SEs clustered by game:
+`d ~ treat + period x clock-bucket + challenger margin bucket + season`
+`+ d_offshare + team fouls in period (each team, capped at 6)`
+`+ players in foul trouble (each team, capped at 3)`.
+- `d_offshare`: change in the share of possessions with the challenger on offense.
+- Team fouls and foul trouble are measured from the feed just after the review. Foul
+  trouble: at least 2 fouls in Q1, 3 in Q2, 4 in Q3, 5 in Q4.
+- **These controls are partly caused by the treatment** (an overturn can remove a foul).
+  That is intended: the estimand is the effect *not* running through foul counts or
+  possession order, which is what separates makeup behavior from mechanics.
+
+**Robustness (pre-specified).** No mechanical controls (shows what they absorb); support-only
+and stands-only controls; first challenge per game only; timeout-identified challengers
+only; defense-only rates; windows ±10 and ±40.
+
+**Power (from lost challenges only, placebo labels, rescaled to the real split).**
+
+| Outcome | MDE (fouls/poss, 80% power) |
+|---|---|
+| d_net | 0.0093 (~10% of the 0.097 per-team base) |
+| d_agg | 0.0064 |
+| d_oth | 0.0068 |
+| d_net_def | 0.0172 |
+
+**Decision rule.** Makeup is supported if the primary `d_net` coefficient is positive with
+a 95% CI excluding zero, and `d_net_def` has the same sign. If the primary holds but
+`d_net_def` does not, report it as unresolved between makeup and possession mechanics.
+
+**Not addressed here.** Which player the overturned call involved (subject-level foul
+trouble) is unknown for most overturns; team-level foul-trouble counts are a proxy.
+
 ## Exploratory
 
 ### Q0-X1. Stoppage/timeout confound (added after Q0 results; not pre-registered)
