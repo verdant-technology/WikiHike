@@ -1,0 +1,44 @@
+[
+  {
+    "season": 2019,
+    "file": "nbastatsv3_2019.tar.xz",
+    "sha256": "3fc651e4c294e231723fa097dca2cf938dd868ee2b9a6111f22ab9c0728e89dc",
+    "bytes": 7529968
+  },
+  {
+    "season": 2020,
+    "file": "nbastatsv3_2020.tar.xz",
+    "sha256": "8bbd2406d741f8247db9eec222bb1655ea699edb60907d3851a048b8ea7a798d",
+    "bytes": 7511996
+  },
+  {
+    "season": 2021,
+    "file": "nbastatsv3_2021.tar.xz",
+    "sha256": "f44ec8a4a9864732fca66943ae4d06a06ef98ba3932571c15a23ecae644f84c4",
+    "bytes": 8567128
+  },
+  {
+    "season": 2022,
+    "file": "nbastatsv3_2022.tar.xz",
+    "sha256": "42c24abf0abbc0ccef00addaba4b8c76df230a0ff3c0e5b301353307941fd04c",
+    "bytes": 8640724
+  },
+  {
+    "season": 2023,
+    "file": "nbastatsv3_2023.tar.xz",
+    "sha256": "3a6976219b87fb50cecf8b2c54cb2af110f2f013ed8368d694035806802c8b04",
+    "bytes": 8622472
+  },
+  {
+    "season": 2024,
+    "file": "nbastatsv3_2024.tar.xz",
+    "sha256": "38fb8bfb43be8db3d47576600f32f25d89cc3cc05ebac77a51f4db42faf0b841",
+    "bytes": 8781060
+  },
+  {
+    "season": 2025,
+    "file": "nbastatsv3_2025.tar.xz",
+    "sha256": "790a01ea3f0b2f8335d96bd687e21501551fc8cdea3ada83457ee3208a940671",
+    "bytes": 8967164
+  }
+]

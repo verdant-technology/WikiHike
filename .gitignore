@@ -9,3 +9,9 @@
 # https://docs.deno.com/runtime/reference/cli/coverage/
 coverage/
 *.lcov
+
+# Data stages (raw archives are reproducible from pipeline/s00_fetch.py; MANIFEST.json is tracked)
+data/raw/*
+!data/raw/MANIFEST.json
+data/clean/
+__pycache__/
