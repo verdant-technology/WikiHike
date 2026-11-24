@@ -93,4 +93,11 @@ For scale: 0.005 fouls/possession is about 0.1 foul over the 20-possession windo
 
 ## Exploratory
 
-(none yet)
+### Q0-X1. Stoppage/timeout confound (added after Q0 results; not pre-registered)
+
+Q0's dip is concentrated in the first 5 possessions after the event. Every challenge
+brings a long stoppage and usually a timeout. Check: compare challenges with unchallenged
+calls that have a non-challenge timeout at the same stoppage (`analysis/q0x_timeout_check.py`).
+Also compare, within unchallenged calls, those followed by a timeout vs not.
+Caveat: timeout-followed calls are not a clean control. Their pre-window bins oscillate
+(media timeouts fall at fixed clock points), so read this as a diagnostic, not an estimate.
